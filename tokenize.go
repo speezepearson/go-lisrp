@@ -1,4 +1,4 @@
-package lisrp_syntax
+package lisrp
 
 import (
 	"errors"
@@ -13,10 +13,10 @@ func MakeNonTokenError(src string) error {
 type TokenType string
 
 const (
-	Symbol TokenType = "Symbol"
-	Int              = "Int"
-	LParen           = "("
-	RParen           = ")"
+	TTSymbol TokenType = "Symbol"
+	TTInt              = "Int"
+	TTLParen           = "("
+	TTRParen           = ")"
 )
 
 type Token struct {
@@ -24,29 +24,33 @@ type Token struct {
 	Source string
 }
 
-const (
-	LParenRegexp = regexp.Compile(`[({\[]`)
-	RParenRegexp = regexp.Compile(`[)}\]]`)
-	NumberRegexp = regexp.Compile(`[+-]?[0-9]+`)
-	SymbolRegexp = regexp.Compile(`[a-zA-Z0-9~!@#$%^&*()_+=|:;'",<.>/?-]+`)
-)
+var QuoteRegexp = regexp.MustCompile(`^'`)
+var LParenRegexp = regexp.MustCompile(`^[({\[]`)
+var RParenRegexp = regexp.MustCompile(`^[)}\]]`)
+var NumberRegexp = regexp.MustCompile(`^[+-]?[0-9]+`)
+var SymbolRegexp = regexp.MustCompile(`^[a-zA-Z0-9~!@#$%^&*_+=|:;'",<.>/?-]+`)
 
 func Tokenize(src string) ([]Token, error) {
 	var result []Token
 	src = strings.TrimSpace(src)
 	for len(src) > 0 {
-		if matches := regexp.FindStringMatch(LParenRegexp, src); matches != nil {
-			append(result, Token{TokenType: LParen, Source: matches[0]})
-		} else if matches := regexp.FindStringMatch(RParenRegexp, src); matches != nil {
-			append(result, Token{TokenType: RParen, Source: matches[0]})
-		} else if matches := regexp.FindStringMatch(NumberRegexp, src); matches != nil {
-			append(result, Token{TokenType: Number, Source: matches[0]})
-		} else if matches := regexp.FindStringMatch(SymbolRegexp, src); matches != nil {
-			append(result, Token{TokenType: Symbol, Source: matches[0]})
+		var match string
+		if matches := LParenRegexp.FindStringSubmatch(src); matches != nil {
+			match = matches[0]
+			result = append(result, Token{TokenType: TTLParen, Source: match})
+		} else if matches := RParenRegexp.FindStringSubmatch(src); matches != nil {
+			match = matches[0]
+			result = append(result, Token{TokenType: TTRParen, Source: match})
+		} else if matches := NumberRegexp.FindStringSubmatch(src); matches != nil {
+			match = matches[0]
+			result = append(result, Token{TokenType: TTInt, Source: match})
+		} else if matches := SymbolRegexp.FindStringSubmatch(src); matches != nil {
+			match = matches[0]
+			result = append(result, Token{TokenType: TTSymbol, Source: match})
 		} else {
 			return nil, MakeNonTokenError(src)
 		}
-		src = strings.TrimSpace(src)
+		src = strings.TrimSpace(strings.TrimPrefix(src, match))
 	}
 	return result, nil
 }
