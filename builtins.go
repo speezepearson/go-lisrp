@@ -7,52 +7,28 @@ import (
 func MakeDefaultEnv() *Env {
 	return &Env{
 		Parent: nil,
-		Bindings: map[string]*Value{
-			"+": &Value{ValueType: VTPrimitiveFunction, PrimitiveFunction: PrimitiveFunction{
+		Bindings: map[string]Value{
+			"+": PrimitiveFunction{
 				Name: "+",
-				Call: func(args []*Value, env *Env) (*Value, *LisrpError) {
+				Code: func(env *Env, args []Value) (Value, *LisrpError) {
 					result := 0
 					for _, arg := range args {
-						if arg.ValueType != VTInt {
+						n, ok := (arg).(Integer)
+						if !ok {
 							return nil, &LisrpError{fmt.Sprintf("can only add ints, not %v", arg)}
 						}
-						result += arg.Int
+						result += n.Value
 					}
-					return &Value{ValueType: VTInt, Int: result}, nil
+					return &Integer{result}, nil
 				},
-			}},
+			},
 
-			"-": &Value{ValueType: VTPrimitiveFunction, PrimitiveFunction: PrimitiveFunction{
-				Name: "-",
-				Call: func(args []*Value, env *Env) (*Value, *LisrpError) {
-					result := 0
-					if len(args) > 1 && args[0].ValueType == VTInt {
-						result = args[0].Int
-						args = args[1:]
-					}
-					for _, arg := range args {
-						if arg.ValueType != VTInt {
-							return nil, &LisrpError{fmt.Sprintf("can only multiply ints, not %v", arg)}
-						}
-						result -= arg.Int
-					}
-					return &Value{ValueType: VTInt, Int: result}, nil
+			"lambda": PrimitiveFunction{
+				Name: "lambda",
+				Code: func(env *Env, args []Value) (Value, *LisrpError) {
+					panic("macros not implemented")
 				},
-			}},
-
-			"*": &Value{ValueType: VTPrimitiveFunction, PrimitiveFunction: PrimitiveFunction{
-				Name: "*",
-				Call: func(args []*Value, env *Env) (*Value, *LisrpError) {
-					result := 1
-					for _, arg := range args {
-						if arg.ValueType != VTInt {
-							return nil, &LisrpError{fmt.Sprintf("can only multiply ints, not %v", arg)}
-						}
-						result *= arg.Int
-					}
-					return &Value{ValueType: VTInt, Int: result}, nil
-				},
-			}},
+			},
 		},
 	}
 }

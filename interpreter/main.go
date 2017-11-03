@@ -29,7 +29,7 @@ func main() {
 	}
 
 	fmt.Printf("parsed is %s; evaluating...\n", expr)
-	val, lerr := lisrp.Eval(expr, lisrp.MakeDefaultEnv())
+	val, lerr := expr.Eval(lisrp.MakeDefaultEnv())
 	if lerr != nil {
 		fmt.Printf("lisrp exception: %s\n", lerr)
 	} else {
