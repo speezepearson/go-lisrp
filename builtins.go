@@ -41,7 +41,7 @@ func MakeDefaultEnv() *Env {
 							assignee.SubExpressions[1].(*Symbol),
 							e.SubExpressions[2],
 						}}
-					})
+					}
 					return &SExpression{[]Expression{
 						&Symbol{"define-symbol"},
 						id,
