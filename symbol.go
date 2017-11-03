@@ -9,7 +9,7 @@ type Symbol struct {
 }
 
 func (sym Symbol) String() string {
-	return "'" + sym.Id
+	return sym.Id
 }
 
 func (sym *Symbol) Eval(env *Env) (Value, *LisrpError) {

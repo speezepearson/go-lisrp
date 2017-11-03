@@ -22,42 +22,36 @@ func (e SExpression) String() string {
 	return fmt.Sprintf("(%s)", strings.Join(words, " "))
 }
 
-func (e *SExpression) MacroExpand(env *Env) interface{} {
-	if len(e.SubExpressions) == 0 {
-		return e
-	}
-	symbol, is_symbol := e.SubExpressions[0].(*Symbol)
-	if !is_symbol {
-		return e
-	}
-	macro, needs_expansion := env.FindMacro(symbol)
-	if !needs_expansion {
-		return e
-	}
-	return macro.Expand(e, env)
-}
-
 func (e *SExpression) Eval(env *Env) (Value, *LisrpError) {
 	if len(e.SubExpressions) == 0 {
 		return nil, &LisrpError{"evaluating empty s-expr"}
 	}
 
-	var prev_val interface{}
-	var new_val interface{}
-	for new_val = e; prev_val != new_val; {
-		new_sexpr, is_sexpression := new_val.(*SExpression)
-		if !is_sexpression {
-			return new_val, nil
+	symbol_head, ok := e.SubExpressions[0].(*Symbol)
+	if ok {
+		might_be_special_or_macro := true
+		for might_be_special_or_macro {
+			special_form, ok := SpecialForms[*symbol_head]
+			if ok {
+				return special_form.Eval(env, e.SubExpressions[1:])
+			}
+
+			macro, ok := env.FindMacro(symbol_head)
+			if ok {
+				expansion_result := macro.Expand(e, env)
+				new_e, ok := expansion_result.(*SExpression)
+				if ok {
+					e = new_e
+				} else {
+					return expansion_result.(Value), nil
+				}
+				continue
+			}
+
+			might_be_special_or_macro = false
 		}
-		prev_val = new_sexpr
-		new_val = new_sexpr.MacroExpand(env)
 	}
 
-	// fmt.Println(e.SubExpressions[0])
-	// fmt.Println(env)
-	// fmt.Println(e.SubExpressions[0].Eval(env))
-	// tmp, _ := e.SubExpressions[0].Eval(env)
-	// fmt.Printf("foo %T\n", tmp)
 	head, lerr := e.SubExpressions[0].Eval(env)
 	if lerr != nil {
 		return nil, lerr
