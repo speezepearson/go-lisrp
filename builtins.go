@@ -27,9 +27,6 @@ func MakeDefaultEnv() *Env {
 			Symbol{"define"}: &PrimitiveMacro{
 				Name: &Symbol{"define"},
 				ExpandFunc: func(e *SExpression, env *Env) interface{} {
-					if e.SubExpressions[0].(*Symbol).Id != "define" {
-						panic(fmt.Sprintf("somehow using `define` macro to expand %v", e.SubExpressions[0].(*Symbol)))
-					}
 					var id *Symbol
 					var expr Expression
 					switch assignee := e.SubExpressions[1].(type) {
