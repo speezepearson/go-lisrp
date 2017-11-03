@@ -23,5 +23,35 @@ func MakeDefaultEnv() *Env {
 				},
 			},
 		},
+		MacroBindings: map[Symbol]Macro{
+			Symbol{"define"}: &PrimitiveMacro{
+				Name: &Symbol{"define"},
+				ExpandFunc: func(e *SExpression, env *Env) interface{} {
+					if e.SubExpressions[0].(*Symbol).Id != "define" {
+						panic(fmt.Sprintf("somehow using `define` macro to expand %v", e.SubExpressions[0].(*Symbol)))
+					}
+					var id *Symbol
+					var expr Expression
+					switch assignee := e.SubExpressions[1].(type) {
+					case *Symbol:
+						id = assignee
+						expr = e.SubExpressions[2]
+					case *SExpression:
+						id = assignee.SubExpressions[0].(*Symbol)
+						expr = &SExpression{[]Expression{
+							&Symbol{"unary-function"},
+							id,
+							assignee.SubExpressions[1].(*Symbol),
+							e.SubExpressions[2],
+						}}
+					})
+					return &SExpression{[]Expression{
+						&Symbol{"define-symbol"},
+						id,
+						expr,
+					}}
+				},
+			},
+		},
 	}
 }

@@ -45,6 +45,11 @@ func (e *SExpression) Eval(env *Env) (Value, *LisrpError) {
 				} else {
 					return expansion_result.(Value), nil
 				}
+
+				symbol_head, ok = new_e.SubExpressions[0].(*Symbol)
+				if !ok {
+					break
+				}
 				continue
 			}
 
