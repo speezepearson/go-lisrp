@@ -1,7 +1,7 @@
 package lisrp
 
 type Env struct {
-	Bindings      map[Symbol]Value
+	Bindings      map[Symbol]LisrpValue
 	MacroBindings map[Symbol]Macro
 	Parent        *Env
 }
@@ -18,7 +18,7 @@ func (env *Env) FindMacro(name *Symbol) (Macro, bool) {
 	return nil, false
 }
 
-func (env *Env) FindBinding(name *Symbol) (Value, bool) {
+func (env *Env) FindBinding(name *Symbol) (LisrpValue, bool) {
 	found := false
 	for (!found) && (env != nil) {
 		value, found := env.Bindings[*name]

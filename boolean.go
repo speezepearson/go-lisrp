@@ -1,12 +1,15 @@
 package lisrp
 
-type LisrpBoolean struct {
-	Value bool
+type Boolean struct {
+	LisrpValue bool
 }
 
-var LisrpTrue = LisrpBoolean{true}
-var LisrpFalse = LisrpBoolean{false}
+var LisrpTrue = Boolean{true}
+var LisrpFalse = Boolean{false}
 
-func (b *LisrpBoolean) Eval(env *Env) (Value, *LisrpError) {
+func (b *Boolean) Type() LisrpType {
+	return BooleanT
+}
+func (b *Boolean) Eval(env *Env) (LisrpValue, *LisrpError) {
 	return b, nil
 }

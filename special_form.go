@@ -6,24 +6,24 @@ import (
 
 type SpecialForm struct {
 	Name *Symbol
-	Eval func(*Env, []Expression) (Value, *LisrpError)
+	Eval func(*Env, []Expression) (LisrpValue, *LisrpError)
 }
 
 var SpecialForms = map[Symbol]SpecialForm{
 	Symbol{"let1"}: SpecialForm{
 		Name: &Symbol{"let1"},
-		Eval: func(env *Env, args []Expression) (Value, *LisrpError) {
+		Eval: func(env *Env, args []Expression) (LisrpValue, *LisrpError) {
 			id := args[0].(*Symbol)
 			bound_value, lerr := args[1].Eval(env)
 			if lerr != nil {
 				return nil, nil
 			}
-			return args[2].Eval(&Env{Parent: env, Bindings: map[Symbol]Value{*id: bound_value}})
+			return args[2].Eval(&Env{Parent: env, Bindings: map[Symbol]LisrpValue{*id: bound_value}})
 		},
 	},
 	Symbol{"unary-function"}: SpecialForm{
 		Name: &Symbol{"unary-function"},
-		Eval: func(env *Env, args []Expression) (Value, *LisrpError) {
+		Eval: func(env *Env, args []Expression) (LisrpValue, *LisrpError) {
 			fname := args[0].(*Symbol)
 			argname := args[1].(*Symbol)
 			return &Function{
@@ -36,7 +36,7 @@ var SpecialForms = map[Symbol]SpecialForm{
 	},
 	Symbol{"define-symbol"}: SpecialForm{
 		Name: &Symbol{"define-symbol"},
-		Eval: func(env *Env, args []Expression) (Value, *LisrpError) {
+		Eval: func(env *Env, args []Expression) (LisrpValue, *LisrpError) {
 			if len(args) != 2 {
 				return nil, &LisrpError{"usage: (define ID EXPR)"}
 			}
@@ -53,12 +53,12 @@ var SpecialForms = map[Symbol]SpecialForm{
 				return nil, lerr
 			}
 			env.Bindings[*id] = val
-			return Void, nil
+			return &Void, nil
 		},
 	},
 	Symbol{"set!"}: SpecialForm{
 		Name: &Symbol{"set!"},
-		Eval: func(env *Env, args []Expression) (Value, *LisrpError) {
+		Eval: func(env *Env, args []Expression) (LisrpValue, *LisrpError) {
 			if len(args) != 2 {
 				return nil, &LisrpError{"usage: (set! ID EXPR)"}
 			}
@@ -74,7 +74,7 @@ var SpecialForms = map[Symbol]SpecialForm{
 						return nil, lerr
 					}
 					env.Bindings[*id] = val
-					return Void, nil
+					return &Void, nil
 				}
 				env = env.Parent
 			}
@@ -83,11 +83,11 @@ var SpecialForms = map[Symbol]SpecialForm{
 	},
 	Symbol{"begin"}: SpecialForm{
 		Name: &Symbol{"begin"},
-		Eval: func(env *Env, args []Expression) (Value, *LisrpError) {
+		Eval: func(env *Env, args []Expression) (LisrpValue, *LisrpError) {
 			if len(args) == 0 {
 				return nil, &LisrpError{"`begin` form must not be empty"}
 			}
-			var result Value
+			var result LisrpValue
 			for _, arg := range args {
 				var lerr *LisrpError
 				result, lerr = arg.Eval(env)
@@ -100,7 +100,7 @@ var SpecialForms = map[Symbol]SpecialForm{
 	},
 	Symbol{"begin0"}: SpecialForm{
 		Name: &Symbol{"begin0"},
-		Eval: func(env *Env, args []Expression) (Value, *LisrpError) {
+		Eval: func(env *Env, args []Expression) (LisrpValue, *LisrpError) {
 			if len(args) == 0 {
 				return nil, &LisrpError{"`begin0` form must not be empty"}
 			}

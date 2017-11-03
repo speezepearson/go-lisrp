@@ -5,13 +5,16 @@ import (
 )
 
 type Integer struct {
-	Value int
+	LisrpValue int
 }
 
 func (n Integer) String() string {
-	return strconv.Itoa(n.Value)
+	return strconv.Itoa(n.LisrpValue)
 }
 
-func (n *Integer) Eval(env *Env) (Value, *LisrpError) {
+func (n *Integer) Type() LisrpType {
+	return IntegerT
+}
+func (n *Integer) Eval(env *Env) (LisrpValue, *LisrpError) {
 	return n, nil
 }

@@ -22,7 +22,7 @@ func (e SExpression) String() string {
 	return fmt.Sprintf("(%s)", strings.Join(words, " "))
 }
 
-func (e *SExpression) Eval(env *Env) (Value, *LisrpError) {
+func (e *SExpression) Eval(env *Env) (LisrpValue, *LisrpError) {
 	if len(e.SubExpressions) == 0 {
 		return nil, &LisrpError{"evaluating empty s-expr"}
 	}
@@ -43,7 +43,7 @@ func (e *SExpression) Eval(env *Env) (Value, *LisrpError) {
 				if ok {
 					e = new_e
 				} else {
-					return expansion_result.(Value), nil
+					return expansion_result.(LisrpValue), nil
 				}
 
 				symbol_head, ok = new_e.SubExpressions[0].(*Symbol)
@@ -66,7 +66,7 @@ func (e *SExpression) Eval(env *Env) (Value, *LisrpError) {
 	if !ok {
 		return nil, &LisrpError{fmt.Sprintf("attempting to call non-function value %v", head)}
 	}
-	args := make([]Value, len(e.SubExpressions)-1)
+	args := make([]LisrpValue, len(e.SubExpressions)-1)
 	for i, _ := range args {
 		args[i], lerr = e.SubExpressions[i+1].Eval(env)
 		if lerr != nil {
