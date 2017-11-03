@@ -30,7 +30,7 @@ func (e *SExpression) MacroExpand(env *Env) interface{} {
 	if !is_symbol {
 		return e
 	}
-	macro, needs_expansion := env.FindMacro(symbol.Id)
+	macro, needs_expansion := env.FindMacro(symbol)
 	if !needs_expansion {
 		return e
 	}

@@ -7,9 +7,9 @@ import (
 func MakeDefaultEnv() *Env {
 	return &Env{
 		Parent: nil,
-		Bindings: map[string]Value{
-			"+": &PrimitiveFunction{
-				Name: "+",
+		Bindings: map[Symbol]Value{
+			Symbol{"+"}: &PrimitiveFunction{
+				Name: &Symbol{"+"},
 				Code: func(env *Env, args []Value) (Value, *LisrpError) {
 					result := 0
 					for _, arg := range args {
@@ -23,7 +23,7 @@ func MakeDefaultEnv() *Env {
 				},
 			},
 		},
-		MacroBindings: map[string]Macro{
+		MacroBindings: map[Symbol]Macro{
 			// "let": &PrimitiveMacro{
 			// 	Name: "let",
 			// 	ExpandFunc: func(e *SExpression, env *Env) interface{} {
@@ -40,17 +40,17 @@ func MakeDefaultEnv() *Env {
 			// 		return e.SubExpressions[2].Eval(&Env{Parent: env, Bindings: bindings})
 			// 	},
 			// },
-			"lambda": &PrimitiveMacro{
-				Name: "lambda",
+			Symbol{"lambda"}: &PrimitiveMacro{
+				Name: &Symbol{"lambda"},
 				ExpandFunc: func(e *SExpression, env *Env) interface{} {
 					id_exprs := e.SubExpressions[1].(*SExpression).SubExpressions
-					arg_names := make([]string, len(id_exprs))
+					arg_names := make([]*Symbol, len(id_exprs))
 					for i, _ := range id_exprs {
-						arg_names[i] = id_exprs[i].(*Symbol).Id
+						arg_names[i] = id_exprs[i].(*Symbol)
 					}
 					return &Function{
 						Closure:  env,
-						Name:     "<lambda>",
+						Name:     &Symbol{"<lambda>"},
 						ArgNames: arg_names,
 						Body:     e.SubExpressions[2],
 					}

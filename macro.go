@@ -8,7 +8,7 @@ type DefinedMacro struct {
 }
 
 type PrimitiveMacro struct {
-	Name       string
+	Name       *Symbol
 	ExpandFunc func(*SExpression, *Env) interface{}
 }
 

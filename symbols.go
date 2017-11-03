@@ -13,7 +13,7 @@ func (sym Symbol) String() string {
 }
 
 func (sym *Symbol) Eval(env *Env) (Value, *LisrpError) {
-	value, found := env.FindBinding(sym.Id)
+	value, found := env.FindBinding(sym)
 	if found {
 		return value, nil
 	}
