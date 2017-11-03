@@ -26,15 +26,15 @@ func ParseExpressionWithLeftovers(tokens []Token) (Expression, []Token, error) {
 		if len(tokens) == 0 {
 			return nil, tokens, errors.New("unclosed parenthesis")
 		}
-		return SExpression{subexprs}, tokens[1:], nil
+		return &SExpression{subexprs}, tokens[1:], nil
 	case TTInt:
 		n, err := strconv.Atoi(tokens[0].Source)
 		if err != nil {
 			panic(fmt.Sprintf("expected to be able to parse '%s' as an int", tokens[0].Source))
 		}
-		return Integer{n}, tokens[1:], nil
+		return &Integer{n}, tokens[1:], nil
 	case TTSymbol:
-		return Symbol{tokens[0].Source}, tokens[1:], nil
+		return &Symbol{tokens[0].Source}, tokens[1:], nil
 	case TTRParen:
 		return nil, tokens, errors.New("unexpected RParen")
 	}

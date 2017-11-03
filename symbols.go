@@ -12,7 +12,7 @@ func (sym Symbol) String() string {
 	return "'" + sym.Id
 }
 
-func (sym Symbol) Eval(env *Env) (Value, *LisrpError) {
+func (sym *Symbol) Eval(env *Env) (Value, *LisrpError) {
 	value, found := env.FindBinding(sym.Id)
 	if found {
 		return value, nil

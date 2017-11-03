@@ -12,6 +12,6 @@ func (n Integer) String() string {
 	return strconv.Itoa(n.Value)
 }
 
-func (n Integer) Eval(env *Env) (Value, *LisrpError) {
+func (n *Integer) Eval(env *Env) (Value, *LisrpError) {
 	return n, nil
 }

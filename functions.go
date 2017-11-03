@@ -4,6 +4,10 @@ import (
 	"fmt"
 )
 
+type Callable interface {
+	Call(*Env, []Value) (Value, *LisrpError)
+}
+
 type Function struct {
 	Closure  *Env
 	Name     string
@@ -15,11 +19,11 @@ func (f *Function) String() string {
 	return fmt.Sprintf("<function %s>", f.Name)
 }
 
-func (f Function) Call(env *Env, args []Value) (Value, *LisrpError) {
+func (f *Function) Call(env *Env, args []Value) (Value, *LisrpError) {
 	if len(f.ArgNames) != len(args) {
 		return nil, &LisrpError{fmt.Sprintf("function %s expected %d args, got %d", f.Name, len(f.ArgNames), len(args))}
 	}
-	new_env := Env{Parent: env}
+	new_env := Env{Bindings: map[string]Value{}, Parent: env}
 	for i, _ := range args {
 		new_env.Bindings[f.ArgNames[i]] = args[i]
 	}
